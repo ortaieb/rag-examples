@@ -12,3 +12,5 @@ dependencies = [
     "pandas",
 ]
 
+[project.scripts]
+rag-examples = "rag_examples.main:main"
