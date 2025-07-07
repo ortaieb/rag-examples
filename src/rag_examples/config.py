@@ -1,0 +1,111 @@
+"""
+Configuration module for rag-examples.
+Loads environment variables and provides immutable configuration values.
+"""
+from dataclasses import dataclass
+from dotenv import load_dotenv
+import os
+import argparse
+from typing import Final
+
+# Load environment variables
+load_dotenv()
+
+
+@dataclass(frozen=True)
+class VectorStoreConfig:
+    """Immutable configuration for vector store settings."""
+    db_location: str
+    k_value: int
+
+
+@dataclass(frozen=True)
+class OllamaConfig:
+    """Immutable configuration for Ollama settings."""
+    embedding_model: str
+    llm_model: str
+
+
+@dataclass(frozen=True)
+class LLMConfig:
+    """Immutable configuration for LLM settings."""
+    temperature: float
+    max_tokens: int
+
+
+@dataclass(frozen=True)
+class AppConfig:
+    """Immutable application configuration."""
+    vector_store: VectorStoreConfig
+    ollama: OllamaConfig
+    llm: LLMConfig
+
+
+def load_config() -> AppConfig:
+    """
+    Load configuration from environment variables with defaults.
+
+    Returns:
+        AppConfig: Immutable configuration object
+    """
+    vector_config = VectorStoreConfig(
+        db_location=os.getenv("VECTOR_DB_LOCATION", "./chroma_store_db"),
+        k_value=int(os.getenv("VECTOR_K_VALUE", "5"))
+    )
+
+    ollama_config = OllamaConfig(
+        embedding_model=os.getenv("OLLAMA_EMBEDDING_MODEL", "mxbai-embed-large"),
+        llm_model=os.getenv("OLLAMA_LLM_MODEL", "llama3.2")
+    )
+
+    llm_config = LLMConfig(
+        temperature=float(os.getenv("TEMPERATURE", "0.1")),
+        max_tokens=int(os.getenv("MAX_TOKENS", "1000"))
+    )
+
+    return AppConfig(
+        vector_store=vector_config,
+        ollama=ollama_config,
+        llm=llm_config
+    )
+
+
+def get_cli_overrides() -> argparse.Namespace:
+    """
+    Get command line overrides for configuration.
+
+    Returns:
+        argparse.Namespace: Command line arguments with CONFIG defaults
+    """
+    parser = argparse.ArgumentParser(description="RAG Examples CLI")
+    parser.add_argument('--model',
+                        default=CONFIG.ollama.llm_model,
+                        help=f'Ollama model to use (default: {CONFIG.ollama.llm_model})')
+
+    parser.add_argument('--emb-model',
+                        default=CONFIG.ollama.embedding_model,
+                        help=f'Embedding modek model to use (default: {CONFIG.ollama.embedding_model})')
+
+    parser.add_argument('--temperature',
+                       type=float,
+                       default=CONFIG.llm.temperature,
+                       help=f'Model temperature (default: {CONFIG.llm.temperature})')
+
+    parser.add_argument('--max-tokens',
+                       type=int,
+                       default=CONFIG.llm.max_tokens,
+                       help=f'Maximum tokens (default: {CONFIG.llm.max_tokens})')
+
+    parser.add_argument('--store-location',
+                        default = CONFIG.vector_store.db_location,
+                        help=f"Location of the vector store persistent copy (default: {CONFIG.vector_store.db_location})")
+
+    parser.add_argument('--n-reviews',
+                        default = CONFIG.vector_store.k_value,
+                        help=f"number of reviews provided to the model (default: {CONFIG.vector_store.k_value})"
+    )
+    return parser.parse_args()
+
+
+# Global configuration instance
+CONFIG: Final[AppConfig] = load_config()
