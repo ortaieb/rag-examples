@@ -25,15 +25,15 @@ if add_documents:
 
   for i, row in df.iterrows():
     document = Document(
-      page_content = row["Title"] + " " + "row[Review]",
-      metadata = { "rating": row["Rating"], "date": row["Data"] },
+      page_content = row["Title"] + " " + row["Review"],
+      metadata = { "rating": row["Rating"], "date": row["Date"] },
       id = str(i)
     )
     ids.append(str(i))
     documents.append(document)
 
 vector_stroe = Chroma(
-  collection_name="Restaurant Reviews",
+  collection_name="Restaurant_Reviews",
   persist_directory=db_location,
   embedding_function=embeddings
 )
