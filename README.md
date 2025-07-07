@@ -13,6 +13,11 @@ Ollama allows you to run LLMs on your local machine. In this usecase, we avoid a
 The assumption is that you run `ollama` on your machine. If not, or you need some help with setting it up, use [Ollama website](https://ollama.com/).
 
 For this example we'd need the following
+```bash
+$ ollama pull llama3.2:latest
+$ ollama pull mxbai-embed-large:latest
+```
+
 ### Running the application
 
 #### DEV
