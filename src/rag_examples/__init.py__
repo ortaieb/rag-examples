@@ -1,0 +1,3 @@
+"""Root level code for rag-examples"""
+
+__version__ = "0.1.0"
