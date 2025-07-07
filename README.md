@@ -4,6 +4,15 @@
 
 ## How to run?
 
+### Where's the engine?
+
+Ollama allows you to run LLMs on your local machine. In this usecase, we avoid any dependencies from outside out machine. This will require two models available for the operation.
+1. General LLM functioning as a chat bot (Let's start with `llama3.2`)
+1. Embeddinbg model, assisting with ingesting the reviews and keep them in the vector store (`mxbai-embed-large`).
+
+The assumption is that you run `ollama` on your machine. If not, or you need some help with setting it up, use [Ollama website](https://ollama.com/).
+
+For this example we'd need the following
 ### Running the application
 
 #### DEV
