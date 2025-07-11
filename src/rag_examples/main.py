@@ -1,9 +1,9 @@
 """
   Main call for running the RAG backed LLM
 """
-from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from vector_store import create_vector_store
+from llm_provider import ClaudeLLMProvider
 
 # Handle imports for both script and module execution
 try:
@@ -16,21 +16,18 @@ except ImportError:
     from rag_examples.config import CONFIG, get_cli_overrides
 
 
-def create_llm_chain(model_name: str, temperature: float) -> tuple[OllamaLLM, ChatPromptTemplate]:
+def create_llm_chain(model_name: str, temperature: float) -> tuple[ClaudeLLMProvider, ChatPromptTemplate]:
     """
     Create LLM chain with immutable configuration.
 
     Args:
-        model_name: Name of the Ollama model to use
+        model_name: Name of the Claude model to use
         temperature: Temperature setting for the model
 
     Returns:
         Tuple of (model, prompt_template)
     """
-    model = OllamaLLM(
-        model=model_name,
-        temperature=temperature,
-    )
+    model = ClaudeLLMProvider(model=model_name, temperature=temperature)
 
     template = """
       You are an exeprt in answering questions about a pizza restaurant.
@@ -57,9 +54,10 @@ def main():
     )
 
     model, prompt = create_llm_chain(cli_config.model, cli_config.temperature)
-    chain = prompt | model
+    # chain = prompt | model  # Remove this, as we will call model.generate directly
 
     print(f"Using model: {cli_config.model}")
+    print(f"Using api_key: {cli_config.anthropic_api_key}")
     print(f"Temperature: {cli_config.temperature}")
     print(f"Store location: {cli_config.store_location}")
     print(f"Number of reviews: {cli_config.n_reviews}")
@@ -78,7 +76,8 @@ def main():
           print(f"\t |")
           print(f"\t + {review}")
         print("\t=========")
-        result = chain.invoke({"reviews": reviews, "question": question})
+        prompt_text = prompt.format(reviews=reviews, question=question)
+        result = model.generate(prompt_text)
         print(result)
 
 
