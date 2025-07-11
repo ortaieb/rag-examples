@@ -10,7 +10,8 @@ dependencies = [
     "langchain-ollama",
     "langchain-chroma",
     "pandas",
-    "dotenv"
+    "python-dotenv",
+    "anthropic"
 ]
 
 [project.scripts]

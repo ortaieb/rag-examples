@@ -99,3 +99,6 @@ Desktop.ini
 *.swp
 *.swo
 *~
+
+chroma_store_db/
+

@@ -61,7 +61,7 @@ try:
     from .config import CONFIG
     retriever = create_vector_store(
         CONFIG.vector_store.db_location,
-        CONFIG.ollama.embedding_model,
+        CONFIG.vector_store.embedding_model,
         CONFIG.vector_store.k_value
     )
 except ImportError:
@@ -72,6 +72,6 @@ except ImportError:
     from rag_examples.config import CONFIG
     retriever = create_vector_store(
         CONFIG.vector_store.db_location,
-        CONFIG.ollama.embedding_model,
+        CONFIG.vector_store.embedding_model,
         CONFIG.vector_store.k_value
     )
