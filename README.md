@@ -1,73 +1,77 @@
-# rag-examples - Ollama Based solution
+# rag-examples (Claude/Anthropic Edition)
 
-##
+## 1. What does it showcase?
 
-## How to run?
+This project demonstrates a Retrieval-Augmented Generation (RAG) pipeline using a local vector store and an external Large Language Model (LLM) provider (Anthropic Claude). It showcases:
+- How to ingest and embed domain-specific data (e.g., reviews) for retrieval.
+- How to use a vector store to fetch relevant context for user queries.
+- How to integrate with Anthropic's Claude API for advanced LLM completions.
+- Immutable, functional configuration and argument parsing.
 
-### Where's the engine?
+## 2. How to operate it
 
-Ollama allows you to run LLMs on your local machine. In this usecase, we avoid any dependencies from outside out machine. This will require two models available for the operation.
-1. General LLM functioning as a chat bot (Let's start with `llama3.2`)
-1. Embeddinbg model, assisting with ingesting the reviews and keep them in the vector store (`mxbai-embed-large`).
+### Prerequisites
+- Python 3.8+
+- [uv](https://github.com/astral-sh/uv) for dependency management and running
+- An Anthropic API key (get one from https://console.anthropic.com/)
 
-The assumption is that you run `ollama` on your machine. If not, or you need some help with setting it up, use [Ollama website](https://ollama.com/).
+For more details about use of uv, try [use_uv](./USE_UV.md).
 
-For this example we'd need the following
-```bash
-$ ollama pull llama3.2:latest
-$ ollama pull mxbai-embed-large:latest
-```
+### Setup
 
-### Running the application
+1. **Clone the repository**
+2. **Install dependencies and build the application:**
+   ```bash
+   uv pip install -e .
+   ```
+3. **Set your Anthropic API key:**
+   - Create a `.env` file or export the variable in your shell:
+     ```bash
+     export ANTHROPIC_API_KEY=sk-ant-...your-key...
+     ```
+   - (Optional) Set the Claude model:
+     ```bash
+     export CLAUDE_MODEL=claude-3-opus-20240229
+     ```
 
-#### DEV
+### Running the Application
 
-While developing, you will need to use the full path to start the application:
+- **Development mode:**
+  ```bash
+  uv run python src/rag_examples/main.py
+  ```
+- **Installed CLI mode:**
+  ```bash
+  uv run rag-examples
+  ```
 
-```bash
-$ uv run python src/rag_examples/main.py
-```
+### Command-line Arguments
 
-#### Using as application
-You can use `uv` to package and install rag_examples in your local python reepository by pip the project:
-```bash
-$ uv pip install -e .
-```
-After that, you'll be able to run the installed package
-```bash
-$ uv run rag-examples
-```
+You can override configuration using CLI arguments:
 
-### Setting up
+| Argument              | Description                                      | Default                      |
+|-----------------------|--------------------------------------------------|------------------------------|
+| --model               | Claude model to use                              | $CLAUDE_MODEL                |
+| --emb-model           | Embedding model for vector store                 | mxbai-embed-large            |
+| --temperature         | LLM temperature                                  | 0.1                          |
+| --max-tokens          | Maximum tokens for LLM response                  | 1000                         |
+| --store-location      | Path to vector store database                    | ./chroma_store_db            |
+| --n-reviews           | Number of reviews to retrieve                    | 5                            |
+| --claude-model        | Claude model to use (overrides --model)          | $CLAUDE_MODEL                |
+| --anthropic-api-key   | Anthropic API key (overrides env variable)       | $ANTHROPIC_API_KEY           |
 
-<Assumption> we'll be using uv to manage the project
-
-#### Initialise the project
-If you already in the project directory the following will be suffecient:
-
-```bash
-$ uv init
-```
-
-(With uv, all you need is to specificy the directory, if you wish to create it: `uv init <my-directory`>)
-
-#### Create a virtual environment
-
-A virtual environment will allow you to isolate dependencies from your general use Python
-
-```bash
-$ uv venv
-```
-
-To use the venv
-```bash
-$ source .venv/bin/activate
-```
-
-#### Setting up dependencies
-Project dependencies are managed inside `pyproject.toml` descriptor.
-To install the dependencies, use `sync` command:
+### Example: Running with Arguments
 
 ```bash
-$ uv sync
+uv run rag-examples \
+  --claude-model claude-3-opus-20240229 \
+  --anthropic-api-key sk-ant-...your-key... \
+  --emb-model mxbai-embed-large \
+  --temperature 0.2 \
+  --max-tokens 800 \
+  --store-location ./my_store \
+  --n-reviews 3
 ```
+
+---
+For more details, see the main README or source code.
